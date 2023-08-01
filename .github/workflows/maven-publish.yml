@@ -25,13 +25,10 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Build with Maven
-      run: |
-        cd NewSMS
-        mvn -B package
+      run: mvn -B package --file NewSMS/pom.xml
 
-    - name: Publish to GitHub Packages Apache Maven
-      run: |
-        cd NewSMS
-        mvn deploy -s $GITHUB_WORKSPACE/settings.xml
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: my-app
+        path: NewSMS/target/*.jar
