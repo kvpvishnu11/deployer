@@ -1,4 +1,4 @@
-name: Maven Package
+name: Maven Package and Docker Image
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-publish:
 
     runs-on: ubuntu-latest
     permissions:
@@ -27,8 +27,13 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file NewSMS/pom.xml
 
-    - name: Publish Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: my-app
-        path: NewSMS/target/*.jar
+    - name: Build Docker image
+      run: docker build -t kvpvishnu11/my-app-image:latest NewSMS/
+
+    - name: Log in to Docker Hub
+      run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+      env:
+        DOCKER_CLI_ASK_PASS: ""
+
+    - name: Push Docker image to Docker Hub
+      run: docker push kvpvishnu11/my-app-image:latest
